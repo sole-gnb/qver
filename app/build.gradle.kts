@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.example.proyecto1raentrega"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.proyecto1raentrega"
@@ -32,7 +32,8 @@ android {
 }
 
 dependencies {
-
+    implementation (libs.okhttp)
+    implementation (libs.gson)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -40,4 +41,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation(libs.glide)
+    annotationProcessor(libs.compiler)
+    implementation(libs.recyclerview)
 }
