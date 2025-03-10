@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.example.proyecto1raentrega"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.proyecto1raentrega"
@@ -41,6 +41,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation("androidx.room:room-runtime:2.5.2")
+    annotationProcessor("androidx.room:room-compiler:2.5.2")
     implementation(libs.glide)
     annotationProcessor(libs.compiler)
     implementation(libs.recyclerview)
