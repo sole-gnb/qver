@@ -13,16 +13,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.proyecto1raentrega.R;
+import com.example.proyecto1raentrega.dto.PeliculaDTO;
 import com.example.proyecto1raentrega.models.Pelicula;
 import com.example.proyecto1raentrega.service.ApiService;
 
 import java.util.List;
 
 public class PeliculasAdapter extends RecyclerView.Adapter<PeliculasAdapter.PeliculaViewHolder> {
-    private List<Pelicula> peliculas;
+    private List<PeliculaDTO> peliculas;
     private Context context;
 
-    public PeliculasAdapter(Context context, List<Pelicula> peliculas) {
+    public PeliculasAdapter(Context context, List<PeliculaDTO> peliculas) {
         this.context = context;
         this.peliculas = peliculas;
     }
@@ -36,7 +37,7 @@ public class PeliculasAdapter extends RecyclerView.Adapter<PeliculasAdapter.Peli
 
     @Override
     public void onBindViewHolder(@NonNull PeliculaViewHolder holder, int position) {
-        Pelicula pelicula = peliculas.get(position);
+        PeliculaDTO pelicula = peliculas.get(position);
 
         holder.textViewTitulo.setText(pelicula.getTitle());
 
@@ -52,7 +53,7 @@ public class PeliculasAdapter extends RecyclerView.Adapter<PeliculasAdapter.Peli
         return peliculas.size();
     }
 
-    public void addPeliculas(List<Pelicula> nuevasPeliculas) {
+    public void addPeliculas(List<PeliculaDTO> nuevasPeliculas) {
         peliculas.addAll(nuevasPeliculas);
         notifyDataSetChanged();
     }

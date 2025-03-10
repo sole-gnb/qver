@@ -3,6 +3,7 @@ package com.example.proyecto1raentrega.service;
 import android.app.Activity;
 import android.content.Context;
 
+import com.example.proyecto1raentrega.dto.PeliculaDTO;
 import com.example.proyecto1raentrega.models.Pelicula;
 import com.google.gson.Gson;
 
@@ -23,7 +24,7 @@ public class ApiService {
     private static final OkHttpClient client = new OkHttpClient();
 
     public interface PeliculasCallback {
-        void onSuccess(List<Pelicula> peliculas);
+        void onSuccess(List<PeliculaDTO> peliculas);
         void onError(String error);
     }
 
@@ -59,7 +60,7 @@ public class ApiService {
                     Gson gson = new Gson();
                     PeliculasResponse peliculasResponse = gson.fromJson(responseBody, PeliculasResponse.class);
 
-                    List<Pelicula> peliculas = peliculasResponse.results;
+                    List<PeliculaDTO> peliculas = peliculasResponse.results;
 
                     if (context != null && context instanceof Activity && !((Activity) context).isFinishing()) {
                         ((Activity) context).runOnUiThread(() -> callback.onSuccess(peliculas));
@@ -72,6 +73,6 @@ public class ApiService {
     }
 
     private static class PeliculasResponse {
-        List<Pelicula> results;
+        List<PeliculaDTO> results;
     }
 }

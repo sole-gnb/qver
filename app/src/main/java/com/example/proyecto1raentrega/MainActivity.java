@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.proyecto1raentrega.adapter.PeliculasAdapter;
+import com.example.proyecto1raentrega.dto.PeliculaDTO;
 import com.example.proyecto1raentrega.models.Pelicula;
 import com.example.proyecto1raentrega.service.ApiService;
 import java.util.ArrayList;
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         ApiService apiService = new ApiService();
         apiService.obtenerPeliculas(page, "28", this, new ApiService.PeliculasCallback() {
             @Override
-            public void onSuccess(List<Pelicula> peliculas) {
+            public void onSuccess(List<PeliculaDTO> peliculas) {
                 runOnUiThread(() -> {
                     adapter.addPeliculas(peliculas);
                     isLoading = false;
