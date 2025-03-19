@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 
 import com.example.proyecto1raentrega.dto.PeliculaDTO;
-import com.example.proyecto1raentrega.models.Pelicula;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -18,7 +17,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class ApiService {
+public class ServiceMovies {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmODc2OTY3OTVlZGYwOTdjNTUxNjRkMGQ2MWU5YmViNCIsIm5iZiI6MTc0MDc2NDQxOS4zNDksInN1YiI6IjY3YzFmNTAzYzVjMmEzNjI5ZmRiY2Y0YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.KnabXszBNpHUTabeZ8bV8MAZXjcns9e87ygioWrqDb8";
     private static final OkHttpClient client = new OkHttpClient();
@@ -30,16 +29,20 @@ public class ApiService {
 
 
 
-    public void obtenerPeliculas(int page, String genero, Context context, PeliculasCallback callback) {
-        HttpUrl url = Objects.requireNonNull(HttpUrl.parse("https://api.themoviedb.org/3/discover/movie"))
+    public void obtenerPeliculas(int page, int genero, String titulo, int anio, Context context, PeliculasCallback callback) {
+        HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse("https://api.themoviedb.org/3/discover/movie"))
                 .newBuilder()
                 .addQueryParameter("include_adult", "false")
                 .addQueryParameter("include_video", "false")
                 .addQueryParameter("language", "es")
                 .addQueryParameter("page", String.valueOf(page))
-                .addQueryParameter("with_genres", genero)
-                .addQueryParameter("sort_by", "popularity.desc")
-                .build();
+                .addQueryParameter("sort_by", "popularity.desc");
+        if (genero > 0) {
+            urlBuilder.addQueryParameter("with_genres", String.valueOf(genero));
+        }
+
+        HttpUrl url = urlBuilder.build();
+
 
         Request request = new Request.Builder()
                 .url(url)
@@ -62,7 +65,7 @@ public class ApiService {
 
                     List<PeliculaDTO> peliculas = peliculasResponse.results;
 
-                    if (context != null && context instanceof Activity && !((Activity) context).isFinishing()) {
+                    if (context instanceof Activity && !((Activity) context).isFinishing()) {
                         ((Activity) context).runOnUiThread(() -> callback.onSuccess(peliculas));
                     }
                 } else {

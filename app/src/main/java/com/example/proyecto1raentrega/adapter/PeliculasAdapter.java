@@ -1,6 +1,6 @@
 package com.example.proyecto1raentrega.adapter;
 
-import android.app.Activity;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.proyecto1raentrega.R;
 import com.example.proyecto1raentrega.dto.PeliculaDTO;
-import com.example.proyecto1raentrega.models.Pelicula;
-import com.example.proyecto1raentrega.service.ApiService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PeliculasAdapter extends RecyclerView.Adapter<PeliculasAdapter.PeliculaViewHolder> {
@@ -25,7 +24,7 @@ public class PeliculasAdapter extends RecyclerView.Adapter<PeliculasAdapter.Peli
 
     public PeliculasAdapter(Context context, List<PeliculaDTO> peliculas) {
         this.context = context;
-        this.peliculas = peliculas;
+        this.peliculas = new ArrayList<>(peliculas); // Evitar modificaciones externas
     }
 
     @NonNull
@@ -38,10 +37,8 @@ public class PeliculasAdapter extends RecyclerView.Adapter<PeliculasAdapter.Peli
     @Override
     public void onBindViewHolder(@NonNull PeliculaViewHolder holder, int position) {
         PeliculaDTO pelicula = peliculas.get(position);
-
         holder.textViewTitulo.setText(pelicula.getTitle());
 
-        // Cargar la imagen con Glide
         String imageUrl = "https://image.tmdb.org/t/p/w500" + pelicula.getPosterPath();
         Glide.with(context)
                 .load(imageUrl)
@@ -53,9 +50,20 @@ public class PeliculasAdapter extends RecyclerView.Adapter<PeliculasAdapter.Peli
         return peliculas.size();
     }
 
-    public void addPeliculas(List<PeliculaDTO> nuevasPeliculas) {
-        peliculas.addAll(nuevasPeliculas);
+
+    public void setPeliculas(List<PeliculaDTO> nuevasPeliculas) {
+        this.peliculas.clear();
+        this.peliculas.addAll(nuevasPeliculas);
+
         notifyDataSetChanged();
+    }
+
+
+    public void addPeliculas(List<PeliculaDTO> nuevasPeliculas) {
+        int previousSize = this.peliculas.size();
+        this.peliculas.addAll(nuevasPeliculas);
+
+        notifyItemRangeInserted(previousSize, nuevasPeliculas.size());
     }
 
     public class PeliculaViewHolder extends RecyclerView.ViewHolder {
