@@ -30,15 +30,29 @@ public class ServiceMovies {
 
 
     public void obtenerPeliculas(int page, int genero, String titulo, int anio, Context context, PeliculasCallback callback) {
-        HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse("https://api.themoviedb.org/3/discover/movie"))
-                .newBuilder()
-                .addQueryParameter("include_adult", "false")
-                .addQueryParameter("include_video", "false")
-                .addQueryParameter("language", "es")
-                .addQueryParameter("page", String.valueOf(page))
-                .addQueryParameter("sort_by", "popularity.desc");
-        if (genero > 0) {
-            urlBuilder.addQueryParameter("with_genres", String.valueOf(genero));
+        HttpUrl.Builder urlBuilder;
+
+        if(titulo!=null && !titulo.isEmpty() && genero <=0 && anio == 0){
+            urlBuilder = Objects.requireNonNull(HttpUrl.parse("https://api.themoviedb.org/3/search/movie"))
+                    .newBuilder()
+                    .addQueryParameter("include_adult", "false")
+                    .addQueryParameter("query", titulo)
+                    .addQueryParameter("language", "es")
+                    .addQueryParameter("page", String.valueOf(page));
+        }else {
+            urlBuilder = Objects.requireNonNull(HttpUrl.parse("https://api.themoviedb.org/3/discover/movie"))
+                    .newBuilder()
+                    .addQueryParameter("include_adult", "false")
+                    .addQueryParameter("include_video", "false")
+                    .addQueryParameter("language", "es")
+                    .addQueryParameter("page", String.valueOf(page))
+                    .addQueryParameter("sort_by", "popularity.desc");
+            if (genero > 0) {
+                urlBuilder.addQueryParameter("with_genres", String.valueOf(genero));
+            }
+            if (anio > 0) {
+                urlBuilder.addQueryParameter("year", String.valueOf(anio));
+            }
         }
 
         HttpUrl url = urlBuilder.build();

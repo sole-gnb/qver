@@ -1,7 +1,6 @@
 package com.example.proyecto1raentrega;
 
-import android.graphics.Rect;
-import android.media.tv.TvContract;
+import android.graphics.Rect;;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
