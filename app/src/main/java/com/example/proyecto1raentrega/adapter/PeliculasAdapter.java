@@ -1,6 +1,5 @@
 package com.example.proyecto1raentrega.adapter;
 
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,12 +18,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PeliculasAdapter extends RecyclerView.Adapter<PeliculasAdapter.PeliculaViewHolder> {
+
     private List<PeliculaDTO> peliculas;
     private Context context;
+    private OnItemClickListener listener;
 
-    public PeliculasAdapter(Context context, List<PeliculaDTO> peliculas) {
+    // 1. INTERFAZ para el click
+    public interface OnItemClickListener {
+        void onItemClick(PeliculaDTO pelicula);
+    }
+
+    // 2. Constructor actualizado
+    public PeliculasAdapter(Context context, List<PeliculaDTO> peliculas, OnItemClickListener listener) {
         this.context = context;
         this.peliculas = new ArrayList<>(peliculas); // Evitar modificaciones externas
+        this.listener = listener;
     }
 
     @NonNull
@@ -37,12 +45,7 @@ public class PeliculasAdapter extends RecyclerView.Adapter<PeliculasAdapter.Peli
     @Override
     public void onBindViewHolder(@NonNull PeliculaViewHolder holder, int position) {
         PeliculaDTO pelicula = peliculas.get(position);
-        holder.textViewTitulo.setText(pelicula.getTitle());
-
-        String imageUrl = "https://image.tmdb.org/t/p/w500" + pelicula.getPosterPath();
-        Glide.with(context)
-                .load(imageUrl)
-                .into(holder.imageViewCaratula);
+        holder.bind(pelicula, listener);
     }
 
     @Override
@@ -50,19 +53,15 @@ public class PeliculasAdapter extends RecyclerView.Adapter<PeliculasAdapter.Peli
         return peliculas.size();
     }
 
-
     public void setPeliculas(List<PeliculaDTO> nuevasPeliculas) {
         this.peliculas.clear();
         this.peliculas.addAll(nuevasPeliculas);
-
         notifyDataSetChanged();
     }
-
 
     public void addPeliculas(List<PeliculaDTO> nuevasPeliculas) {
         int previousSize = this.peliculas.size();
         this.peliculas.addAll(nuevasPeliculas);
-
         notifyItemRangeInserted(previousSize, nuevasPeliculas.size());
     }
 
@@ -74,6 +73,22 @@ public class PeliculasAdapter extends RecyclerView.Adapter<PeliculasAdapter.Peli
             super(itemView);
             textViewTitulo = itemView.findViewById(R.id.textViewTitulo);
             imageViewCaratula = itemView.findViewById(R.id.imageViewCaratula);
+        }
+
+        // 3. Método para enlazar los datos y el click
+        public void bind(final PeliculaDTO pelicula, final OnItemClickListener listener) {
+            textViewTitulo.setText(pelicula.getTitle());
+
+            String imageUrl = "https://image.tmdb.org/t/p/w500" + pelicula.getPosterPath();
+            Glide.with(context)
+                    .load(imageUrl)
+                    .into(imageViewCaratula);
+
+            itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onItemClick(pelicula);
+                }
+            });
         }
     }
 }

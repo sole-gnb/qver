@@ -1,0 +1,27 @@
+<resources>
+
+    <!-- Tema personalizado para la aplicación -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
+
+    <!-- Botón de filtro -->
+    <style name="ButtonStyle">
+        <item name="android:backgroundTint">@color/red</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:padding">@dimen/padding_large</item>
+    </style>
+
+    <style name="SpinnerStyle">
+        <item name="android:background">@android:drawable/spinner_background</item>
+        <item name="android:dropDownSelector">@android:color/white</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:popupBackground">@color/black</item>
+        <item name="android:dropDownVerticalOffset">4dp</item>
+        <item name="android:dropDownHorizontalOffset">4dp</item>
+    </style>
+</resources>
