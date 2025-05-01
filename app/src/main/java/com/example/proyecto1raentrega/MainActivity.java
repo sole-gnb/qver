@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -14,6 +15,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -46,11 +49,25 @@ public class MainActivity extends AppCompatActivity {
 
     private List<PeliculaDTO> listaPeliculas = new ArrayList<>(); // Agregado para manejar la lista.
 
+    private DrawerLayout drawerLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Configurar DrawerLayout y NavigationView
+        drawerLayout = findViewById(R.id.drawerLayout);
+
+        // Configurar Toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // Habilitar el ícono de hamburguesa en la ActionBar
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.baseline_menu_24); // Asegúrate de tener el ícono
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // Configurar el RecyclerView y los filtros
         recyclerView = findViewById(R.id.recyclerViewPeliculas);
         autoCompleteTitulo = findViewById(R.id.autoCompleteTitulo);
         spinnerGenero = findViewById(R.id.spinnerGenero);
@@ -58,14 +75,6 @@ public class MainActivity extends AppCompatActivity {
         btnFiltrar = findViewById(R.id.btnFiltrar);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
-            @Override
-            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-                super.getItemOffsets(outRect, view, parent, state);
-                outRect.top = 4;
-                outRect.bottom = 4;
-            }
-        });
 
         // Aquí el Adapter NUEVO con el click listener
         adapter = new PeliculasAdapter(this, new ArrayList<>(), pelicula -> {
@@ -96,6 +105,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        // Abrir el menú lateral cuando se hace click en el ícono de hamburguesa
+        if (item.getItemId() == android.R.id.home) {
+            drawerLayout.openDrawer(findViewById(R.id.navigationView));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void cargarGeneros() {
