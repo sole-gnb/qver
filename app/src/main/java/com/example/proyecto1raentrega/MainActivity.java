@@ -1,11 +1,9 @@
 package com.example.proyecto1raentrega;
 
 import android.content.Intent;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -16,15 +14,19 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.proyecto1raentrega.activity.PeliculasFavoritasActivity;
+import com.example.proyecto1raentrega.activity.PeliculasParaVerActivity;
 import com.example.proyecto1raentrega.adapter.PeliculasAdapter;
 import com.example.proyecto1raentrega.dto.GenresDTO;
 import com.example.proyecto1raentrega.dto.PeliculaDTO;
 import com.example.proyecto1raentrega.service.ServiceMovies;
 import com.example.proyecto1raentrega.service.ServiceGenres;
+import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private List<PeliculaDTO> listaPeliculas = new ArrayList<>(); // Agregado para manejar la lista.
 
     private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Configurar DrawerLayout y NavigationView
         drawerLayout = findViewById(R.id.drawerLayout);
+        navigationView = findViewById(R.id.navigationView);
 
         // Configurar Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -90,6 +94,21 @@ public class MainActivity extends AppCompatActivity {
 
         btnFiltrar.setOnClickListener(v -> aplicarFiltros());
 
+        navigationView.setNavigationItemSelectedListener(menuItem -> {
+            int id = menuItem.getItemId();
+
+          if (id == R.id.nav_favorite_movie) {
+                Intent intent = new Intent(MainActivity.this, PeliculasFavoritasActivity.class);
+                startActivity(intent);
+          }else if(id == R.id.nav_movies_to_watch){
+              Intent intent = new Intent(MainActivity.this, PeliculasParaVerActivity.class);
+              startActivity(intent);
+          }
+
+            drawerLayout.closeDrawer(GravityCompat.START); // Cerrar el Drawer después de seleccionar
+            return true;
+        });
+
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -109,10 +128,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        // Abrir el menú lateral cuando se hace click en el ícono de hamburguesa
         if (item.getItemId() == android.R.id.home) {
-            drawerLayout.openDrawer(findViewById(R.id.navigationView));
-            return true;
+            drawerLayout.openDrawer(GravityCompat.START);
         }
         return super.onOptionsItemSelected(item);
     }

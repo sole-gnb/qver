@@ -5,6 +5,16 @@ import java.util.List;
 public class DetallePeliculaDTO {
 
     private String title;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    private int id;
     private String overview;
     private String release_date;
     private double popularity;

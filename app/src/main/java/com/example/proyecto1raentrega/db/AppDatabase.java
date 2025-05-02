@@ -5,14 +5,17 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import android.content.Context;
 
-import com.example.proyecto1raentrega.models.Pelicula;
+import com.example.proyecto1raentrega.models.PeliculasFavoritas;
+import com.example.proyecto1raentrega.models.PeliculasVer;
 
-@Database(entities = {Pelicula.class}, version = 1)
+@Database(entities =  {PeliculasVer.class, PeliculasFavoritas.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase INSTANCE;
 
-    public abstract PeliculaDao peliculaDao();
+    public abstract PeliculasFavoritasDao peliculasFavoritasDaoDao();
+
+    public abstract PeliculasParaVerDao peliculasParaVerDaoDao();
 
     public static synchronized AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {

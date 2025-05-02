@@ -22,7 +22,7 @@ public class ServiceGenres {
 
         Request request = new Request.Builder()
                 .url(url)
-                .addHeader("Authorization", AUTH_TOKEN)  // Reemplaza con tu token
+                .addHeader("Authorization", AUTH_TOKEN)
                 .addHeader("accept", "application/json")
                 .build();
 

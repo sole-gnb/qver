@@ -28,10 +28,9 @@ public class PeliculasAdapter extends RecyclerView.Adapter<PeliculasAdapter.Peli
         void onItemClick(PeliculaDTO pelicula);
     }
 
-    // 2. Constructor actualizado
     public PeliculasAdapter(Context context, List<PeliculaDTO> peliculas, OnItemClickListener listener) {
         this.context = context;
-        this.peliculas = new ArrayList<>(peliculas); // Evitar modificaciones externas
+        this.peliculas = new ArrayList<>(peliculas);
         this.listener = listener;
     }
 
@@ -75,7 +74,6 @@ public class PeliculasAdapter extends RecyclerView.Adapter<PeliculasAdapter.Peli
             imageViewCaratula = itemView.findViewById(R.id.imageViewCaratula);
         }
 
-        // 3. Método para enlazar los datos y el click
         public void bind(final PeliculaDTO pelicula, final OnItemClickListener listener) {
             textViewTitulo.setText(pelicula.getTitle());
 

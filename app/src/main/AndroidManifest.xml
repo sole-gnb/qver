@@ -18,7 +18,7 @@
 
         <activity
             android:name=".DetallePeliculaActivity"
-            android:exported="false" /> <!-- <<< AÑADIDO AQUÍ -->
+            android:exported="false" />
 
         <activity
             android:name=".MainScreenActivity"
@@ -31,6 +31,11 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity android:name=".activity.PeliculasFavoritasActivity">
+        </activity>
+        <activity android:name=".activity.PeliculasParaVerActivity">
         </activity>
 
     </application>

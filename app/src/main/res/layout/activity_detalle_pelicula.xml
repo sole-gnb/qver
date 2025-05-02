@@ -44,7 +44,7 @@
             android:textColor="@android:color/white"
             android:layout_marginBottom="8dp"/>
 
-
+        <!-- Actores -->
         <TextView
             android:id="@+id/textViewActoresDetalle"
             android:layout_width="match_parent"
@@ -55,7 +55,7 @@
             android:textColor="@android:color/white"
             android:textStyle="bold"/>
 
-        <!-- Descripción de la película -->
+        <!-- Descripción -->
         <TextView
             android:id="@+id/textViewDescripcionDetalle"
             android:layout_width="match_parent"
@@ -64,6 +64,38 @@
             android:textSize="16sp"
             android:textColor="@android:color/white"
             android:layout_marginTop="12dp" />
+
+        <!-- Botones de acción -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="32dp">
+
+            <Button
+                android:id="@+id/btnAgregarFavoritos"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Añadir a Favoritos"
+                android:textAllCaps="false"
+                android:backgroundTint="@color/design_default_color_primary"
+                android:textColor="@android:color/white"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:id="@+id/btnAgregarParaVer"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Añadir para Ver"
+                android:textAllCaps="false"
+                android:backgroundTint="@color/design_default_color_primary"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

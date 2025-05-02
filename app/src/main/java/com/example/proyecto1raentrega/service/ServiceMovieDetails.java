@@ -43,7 +43,6 @@ public class ServiceMovieDetails {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                // Aquí ejecutamos el Toast en el hilo principal
                 if (context instanceof Activity && !((Activity) context).isFinishing()) {
                     ((Activity) context).runOnUiThread(() -> {
                         Toast.makeText(context, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -62,7 +61,6 @@ public class ServiceMovieDetails {
                         ((Activity) context).runOnUiThread(() -> callback.onSuccess(detalle));
                     }
                 } else {
-                    // Si hubo un error en la respuesta, también debemos mostrar el Toast en el hilo principal
                     if (context instanceof Activity && !((Activity) context).isFinishing()) {
                         ((Activity) context).runOnUiThread(() -> {
                             Toast.makeText(context, "Error en la respuesta", Toast.LENGTH_SHORT).show();
