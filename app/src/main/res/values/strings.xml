@@ -10,4 +10,8 @@
     <string name="bienvenido">Bienvenido</string>
     <string name="inicio">Películas Favoritas</string>
     <string name="peliculas_ver">Películas para ver</string>
+    <string name="series_ver">Series para ver</string>
+    <string name="series_favoritas">Series Favoritas</string>
+    <string name="pel_culas">Películas</string>
+    <string name="series">Series</string>
 </resources>

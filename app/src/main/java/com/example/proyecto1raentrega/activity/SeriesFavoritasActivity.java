@@ -1,7 +1,5 @@
 package com.example.proyecto1raentrega.activity;
 
-
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -13,25 +11,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.proyecto1raentrega.DetallePeliculaActivity;
 import com.example.proyecto1raentrega.R;
 import com.example.proyecto1raentrega.adapter.MediaAdapter;
-import com.example.proyecto1raentrega.adapter.PeliculasAdapter;
 import com.example.proyecto1raentrega.db.AppDatabase;
 import com.example.proyecto1raentrega.dto.MediaDTO;
-import com.example.proyecto1raentrega.dto.PeliculaDTO;
-import com.example.proyecto1raentrega.models.PeliculasVer;
+import com.example.proyecto1raentrega.models.PeliculasFavoritas;
+import com.example.proyecto1raentrega.models.SeriesFavoritas;
 import com.example.proyecto1raentrega.service.ServiceMediaDetails;
-import com.example.proyecto1raentrega.service.ServiceMovieDetails;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PeliculasParaVerActivity  extends AppCompatActivity implements MediaAdapter.OnItemClickListener  {
-
-
+public class SeriesFavoritasActivity extends AppCompatActivity implements MediaAdapter.OnItemClickListener {
     private RecyclerView recyclerView;
     private MediaAdapter adapter;
-    private List<MediaDTO> listaPeliculas;
+    private List<MediaDTO> listaSeries;
 
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,23 +32,23 @@ public class PeliculasParaVerActivity  extends AppCompatActivity implements Medi
 
         recyclerView = findViewById(R.id.recyclerViewFavoritos);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        listaPeliculas = new ArrayList<>();
+        listaSeries = new ArrayList<>();
 
-        cargarPeliculasParaVer();
+        adapter = new MediaAdapter(this, listaSeries, this);
+        recyclerView.setAdapter(adapter);
 
-
+        cargarPeliculasFavoritas();
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private void cargarPeliculasParaVer() {
+    private void cargarPeliculasFavoritas() {
         new Thread(() -> {
-            List<PeliculasVer> favoritas = AppDatabase.getInstance(this)
-                    .peliculasParaVerDaoDao()
-                    .getAllPeliculasVer();
+            List<SeriesFavoritas> favoritas = AppDatabase.getInstance(this)
+                    .seriesFavoritasDaoDao()
+                    .getAllSeriesFavoritas();
 
             runOnUiThread(() -> {
                 if (favoritas.isEmpty()) {
-                    Toast.makeText(this, "No hay películas favoritas", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "No hay series favoritas", Toast.LENGTH_SHORT).show();
                 } else {
                     for (int i = 0; i < favoritas.size(); i++) {
                         int finalI = i;
@@ -67,38 +60,34 @@ public class PeliculasParaVerActivity  extends AppCompatActivity implements Medi
     }
 
     private void cargarPeliculaDesdeAPI(int id, boolean esUltima) {
-        new ServiceMediaDetails().obtenerDetalle("movie",id, this, new ServiceMediaDetails.DetalleCallback() {
+        new ServiceMediaDetails().obtenerDetalle("tv",id, this, new ServiceMediaDetails.DetalleCallback() {
             @Override
             public void onSuccess(com.example.proyecto1raentrega.dto.DetalleMediaDTO detalle) {
                 runOnUiThread(() -> {
-                    MediaDTO peliculaDTO = new MediaDTO();
-                    peliculaDTO.setId(detalle.getId());
-                    peliculaDTO.setTitle(detalle.getTitle());
-                    peliculaDTO.setPoster_path(detalle.getPoster_path());
+                    MediaDTO media = new MediaDTO();
+                    media.setId(detalle.getId());
+                    media.setTitle(detalle.getName());
+                    media.setPoster_path(detalle.getPoster_path());
 
-                    listaPeliculas.add(peliculaDTO);
+                    listaSeries.add(media);
 
                     if (esUltima) {
-                        adapter = new MediaAdapter(PeliculasParaVerActivity.this, listaPeliculas, PeliculasParaVerActivity.this);
-                        recyclerView.setAdapter(adapter);
+                        adapter.setMedia(listaSeries); // Refresca el adapter con la lista completa
                     }
                 });
             }
 
-
             @Override
             public void onError(String error) {
-                Toast.makeText(PeliculasParaVerActivity.this, "Error cargando película: " + error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(SeriesFavoritasActivity.this, "Error cargando película: " + error, Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     @Override
-    public void onItemClick(MediaDTO pelicula) {
-        Intent intent = new Intent(this, DetallePeliculaActivity.class);
-        intent.putExtra("pelicula_id", pelicula.getId());
+    public void onItemClick(MediaDTO media) {
+        Intent intent = new Intent(this, DetalleSerieActivity.class);
+        intent.putExtra("serie_id", media.getId());
         startActivity(intent);
     }
 }
-

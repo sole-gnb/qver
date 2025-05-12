@@ -7,8 +7,10 @@ import android.content.Context;
 
 import com.example.proyecto1raentrega.models.PeliculasFavoritas;
 import com.example.proyecto1raentrega.models.PeliculasVer;
+import com.example.proyecto1raentrega.models.SeriesFavoritas;
+import com.example.proyecto1raentrega.models.SeriesVer;
 
-@Database(entities =  {PeliculasVer.class, PeliculasFavoritas.class}, version = 1)
+@Database(entities =  {PeliculasVer.class, PeliculasFavoritas.class, SeriesFavoritas.class, SeriesVer.class}, version = 2)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase INSTANCE;
@@ -16,6 +18,11 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract PeliculasFavoritasDao peliculasFavoritasDaoDao();
 
     public abstract PeliculasParaVerDao peliculasParaVerDaoDao();
+
+    public abstract SeriesFavoritasDao seriesFavoritasDaoDao();
+
+    public abstract SeriesVerDao seriesVerDaoParaVerDaoDao();
+
 
     public static synchronized AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {

@@ -17,8 +17,9 @@ public class ServiceGenres {
     private static final String AUTH_TOKEN = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmODc2OTY3OTVlZGYwOTdjNTUxNjRkMGQ2MWU5YmViNCIsIm5iZiI6MTc0MDc2NDQxOS4zNDksInN1YiI6IjY3YzFmNTAzYzVjMmEzNjI5ZmRiY2Y0YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.KnabXszBNpHUTabeZ8bV8MAZXjcns9e87ygioWrqDb8";
     private static final OkHttpClient client = new OkHttpClient();
 
-    public static void getGenres(GenresCallback callback) {
-        String url = "https://api.themoviedb.org/3/genre/movie/list?language=es";
+    public static void getGenres(String type ,GenresCallback callback) {
+
+        String url = "https://api.themoviedb.org/3/genre/"+type+"/list?language=es";
 
         Request request = new Request.Builder()
                 .url(url)

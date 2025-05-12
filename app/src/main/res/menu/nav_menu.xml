@@ -7,4 +7,12 @@
         android:id="@+id/nav_movies_to_watch"
         android:title="@string/peliculas_ver"
         android:icon="@drawable/ic_peliculas_para_ver" />
+    <item
+        android:id="@+id/nav_favorite_series"
+        android:title="@string/series_favoritas"
+        android:icon="@drawable/ic_favoritas" />
+    <item
+        android:id="@+id/nav_series_to_watch"
+        android:title="@string/series_ver"
+        android:icon="@drawable/ic_peliculas_para_ver" />
 </menu>

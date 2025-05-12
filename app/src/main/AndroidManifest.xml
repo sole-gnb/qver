@@ -26,6 +26,10 @@
 
         <activity
             android:name=".MainActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".activity.SeleccionTipoActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,6 +41,13 @@
         </activity>
         <activity android:name=".activity.PeliculasParaVerActivity">
         </activity>
+        <activity android:name=".activity.DetalleSerieActivity">
+        </activity>
+        <activity android:name=".activity.SeriesFavoritasActivity">
+        </activity>
+        <activity android:name=".activity.SeriesParaVerActivity">
+        </activity>
+
 
     </application>
 

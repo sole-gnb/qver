@@ -11,22 +11,24 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.proyecto1raentrega.DetallePeliculaActivity;
 import com.example.proyecto1raentrega.R;
+import com.example.proyecto1raentrega.adapter.MediaAdapter;
 import com.example.proyecto1raentrega.adapter.PeliculasAdapter;
 import com.example.proyecto1raentrega.db.AppDatabase;
+import com.example.proyecto1raentrega.dto.MediaDTO;
 import com.example.proyecto1raentrega.models.PeliculasFavoritas;
 import com.example.proyecto1raentrega.dto.PeliculaDTO;
+import com.example.proyecto1raentrega.service.ServiceMediaDetails;
 import com.example.proyecto1raentrega.service.ServiceMovieDetails;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PeliculasFavoritasActivity extends AppCompatActivity implements PeliculasAdapter.OnItemClickListener {
+public class PeliculasFavoritasActivity extends AppCompatActivity implements MediaAdapter.OnItemClickListener {
 
     private RecyclerView recyclerView;
-    private PeliculasAdapter adapter;
-    private List<PeliculaDTO> listaPeliculas;
+    private MediaAdapter adapter;
+    private List<MediaDTO> listaPeliculas;
 
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,12 +38,12 @@ public class PeliculasFavoritasActivity extends AppCompatActivity implements Pel
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         listaPeliculas = new ArrayList<>();
 
+        adapter = new MediaAdapter(this, listaPeliculas, this);
+        recyclerView.setAdapter(adapter);
+
         cargarPeliculasFavoritas();
-
-
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     private void cargarPeliculasFavoritas() {
         new Thread(() -> {
             List<PeliculasFavoritas> favoritas = AppDatabase.getInstance(this)
@@ -62,37 +64,34 @@ public class PeliculasFavoritasActivity extends AppCompatActivity implements Pel
     }
 
     private void cargarPeliculaDesdeAPI(int id, boolean esUltima) {
-        new ServiceMovieDetails().obtenerDetallePelicula(id, this, new ServiceMovieDetails.DetalleCallback() {
+        new ServiceMediaDetails().obtenerDetalle("movie",id, this, new ServiceMediaDetails.DetalleCallback() {
             @Override
-            public void onSuccess(com.example.proyecto1raentrega.dto.DetallePeliculaDTO detalle) {
+            public void onSuccess(com.example.proyecto1raentrega.dto.DetalleMediaDTO detalle) {
                 runOnUiThread(() -> {
-                    PeliculaDTO peliculaDTO = new PeliculaDTO();
-                    peliculaDTO.setId(detalle.getId());
-                    peliculaDTO.setTitle(detalle.getTitle());
-                    peliculaDTO.setPosterPath(detalle.getPosterPath());
+                    MediaDTO media = new MediaDTO();
+                    media.setId(detalle.getId());
+                    media.setTitle(detalle.getTitle());
+                    media.setPoster_path(detalle.getPoster_path());
 
-                    listaPeliculas.add(peliculaDTO);
+                    listaPeliculas.add(media);
 
                     if (esUltima) {
-                        adapter = new PeliculasAdapter(PeliculasFavoritasActivity.this, listaPeliculas, PeliculasFavoritasActivity.this);
-                        recyclerView.setAdapter(adapter);
+                        adapter.setMedia(listaPeliculas); // Refresca el adapter con la lista completa
                     }
                 });
             }
-
 
             @Override
             public void onError(String error) {
                 Toast.makeText(PeliculasFavoritasActivity.this, "Error cargando película: " + error, Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     @Override
-    public void onItemClick(PeliculaDTO pelicula) {
+    public void onItemClick(MediaDTO media) {
         Intent intent = new Intent(this, DetallePeliculaActivity.class);
-        intent.putExtra("pelicula_id", pelicula.getId());
+        intent.putExtra("pelicula_id", media.getId());
         startActivity(intent);
     }
 }

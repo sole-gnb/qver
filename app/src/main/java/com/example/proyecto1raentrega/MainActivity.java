@@ -19,11 +19,17 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.proyecto1raentrega.activity.DetalleSerieActivity;
 import com.example.proyecto1raentrega.activity.PeliculasFavoritasActivity;
 import com.example.proyecto1raentrega.activity.PeliculasParaVerActivity;
+import com.example.proyecto1raentrega.activity.SeriesFavoritasActivity;
+import com.example.proyecto1raentrega.activity.SeriesParaVerActivity;
+import com.example.proyecto1raentrega.adapter.MediaAdapter;
 import com.example.proyecto1raentrega.adapter.PeliculasAdapter;
 import com.example.proyecto1raentrega.dto.GenresDTO;
+import com.example.proyecto1raentrega.dto.MediaDTO;
 import com.example.proyecto1raentrega.dto.PeliculaDTO;
+import com.example.proyecto1raentrega.service.ServiceMedia;
 import com.example.proyecto1raentrega.service.ServiceMovies;
 import com.example.proyecto1raentrega.service.ServiceGenres;
 import com.google.android.material.navigation.NavigationView;
@@ -36,7 +42,7 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private PeliculasAdapter adapter;
+    private MediaAdapter adapter;
     private int currentPage = 1;
     private boolean isLoading = false;
     private static final int TOTAL_PAGES = 10;
@@ -49,10 +55,11 @@ public class MainActivity extends AppCompatActivity {
     private Map<Integer, String> generosMap = new HashMap<>();
     private List<String> nombresGeneros = new ArrayList<>();
 
-    private List<PeliculaDTO> listaPeliculas = new ArrayList<>(); // Agregado para manejar la lista.
+    private List<MediaDTO> listaPeliculas = new ArrayList<>(); // Agregado para manejar la lista.
 
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+    private String tipo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,17 +87,28 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
-        // Aquí el Adapter NUEVO con el click listener
-        adapter = new PeliculasAdapter(this, new ArrayList<>(), pelicula -> {
-            Intent intent = new Intent(MainActivity.this, DetallePeliculaActivity.class);
-            intent.putExtra("pelicula_id", pelicula.getId());
-            startActivity(intent);
-        });
+        tipo = getIntent().getStringExtra("tipo");
+
+        if(tipo.equals("movie")) {
+            adapter = new MediaAdapter(this, new ArrayList<>(), pelicula -> {
+                Intent intent = new Intent(MainActivity.this, DetallePeliculaActivity.class);
+                intent.putExtra("pelicula_id", pelicula.getId());
+                intent.putExtra("media_type", tipo);
+                startActivity(intent);
+            });
+        }else{
+            adapter = new MediaAdapter(this, new ArrayList<>(), pelicula -> {
+                Intent intent = new Intent(MainActivity.this, DetalleSerieActivity.class);
+                intent.putExtra("serie_id", pelicula.getId());
+                intent.putExtra("media_type", tipo);
+                startActivity(intent);
+            });
+        }
 
         recyclerView.setAdapter(adapter);
 
         cargarGeneros();
-        obtenerPeliculas(currentPage, 0, null, 0);
+        obtenerPeliculas(tipo,currentPage, 0, null, 0);
 
         btnFiltrar.setOnClickListener(v -> aplicarFiltros());
 
@@ -102,6 +120,12 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
           }else if(id == R.id.nav_movies_to_watch){
               Intent intent = new Intent(MainActivity.this, PeliculasParaVerActivity.class);
+              startActivity(intent);
+          }else if(id == R.id.nav_favorite_series){
+              Intent intent = new Intent(MainActivity.this, SeriesFavoritasActivity.class);
+              startActivity(intent);
+          }else{
+              Intent intent = new Intent(MainActivity.this, SeriesParaVerActivity.class);
               startActivity(intent);
           }
 
@@ -135,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void cargarGeneros() {
-        ServiceGenres.getGenres(new ServiceGenres.GenresCallback() {
+        ServiceGenres.getGenres(tipo,new ServiceGenres.GenresCallback() {
             @Override
             public void onSuccess(List<GenresDTO> generos) {
                 runOnUiThread(() -> {
@@ -164,21 +188,21 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void obtenerPeliculas(int page, int genero, String titulo, int anio) {
+    private void obtenerPeliculas(String type,int page, int genero, String titulo, int anio) {
         isLoading = true;
-        ServiceMovies serviceMovies = new ServiceMovies();
-        serviceMovies.obtenerPeliculas(page, genero, titulo, anio, this, new ServiceMovies.PeliculasCallback() {
+        ServiceMedia serviceMovies = new ServiceMedia();
+        serviceMovies.obtenerMedia(type,page, genero, titulo, anio, this, new ServiceMedia.MediaCallback() {
             @Override
-            public void onSuccess(List<PeliculaDTO> peliculas) {
+            public void onSuccess(List<MediaDTO> peliculas) {
                 runOnUiThread(() -> {
                     if (page == 1) {
                         listaPeliculas.clear();
                         listaPeliculas.addAll(peliculas);
-                        adapter.setPeliculas(listaPeliculas);
+                        adapter.addMedia(listaPeliculas);
                         recyclerView.scrollToPosition(0);
                     } else {
                         listaPeliculas.addAll(peliculas);
-                        adapter.addPeliculas(peliculas);
+                        adapter.addMedia(peliculas);
                         recyclerView.smoothScrollToPosition(adapter.getItemCount() - peliculas.size());
                     }
                     isLoading = false;
@@ -214,14 +238,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        ServiceMovies serviceMovies = new ServiceMovies();
-        serviceMovies.obtenerPeliculas(currentPage, idGenero, titulo, Integer.parseInt(anio), this, new ServiceMovies.PeliculasCallback() {
+        ServiceMedia serviceMovies = new ServiceMedia();
+        serviceMovies.obtenerMedia(tipo,currentPage, idGenero, titulo, Integer.parseInt(anio), this, new ServiceMedia.MediaCallback() {
             @Override
-            public void onSuccess(List<PeliculaDTO> peliculas) {
+            public void onSuccess(List<MediaDTO> peliculas) {
                 runOnUiThread(() -> {
                     if (!peliculas.isEmpty()) {
                         listaPeliculas.addAll(peliculas);
-                        adapter.addPeliculas(peliculas);
+                        adapter.addMedia(peliculas);
                         recyclerView.smoothScrollToPosition(adapter.getItemCount() - peliculas.size());
                     }
                     isLoading = false;
@@ -255,8 +279,8 @@ public class MainActivity extends AppCompatActivity {
         }
         currentPage = 1;
         listaPeliculas.clear();
-        adapter.setPeliculas(new ArrayList<>());
+        adapter.setMedia(new ArrayList<>());
         recyclerView.post(() -> recyclerView.scrollToPosition(0));
-        obtenerPeliculas(currentPage, idGenero, titulo, Integer.parseInt(anio));
+        obtenerPeliculas(tipo,currentPage, idGenero, titulo, Integer.parseInt(anio));
     }
 }
