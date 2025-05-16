@@ -11,10 +11,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.example.proyecto1raentrega.db.AppDatabase;
-import com.example.proyecto1raentrega.dto.DetallePeliculaDTO;
+import com.example.proyecto1raentrega.dto.DetalleMediaDTO;
 import com.example.proyecto1raentrega.models.PeliculasFavoritas;
 import com.example.proyecto1raentrega.models.PeliculasVer;
-import com.example.proyecto1raentrega.service.ServiceMovieDetails;
+import com.example.proyecto1raentrega.service.ServiceMediaDetails;
 
 import java.util.List;
 
@@ -45,16 +45,17 @@ public class DetallePeliculaActivity extends AppCompatActivity {
 
         int movieId = getIntent().getIntExtra("pelicula_id", 0);
 
-        new ServiceMovieDetails().obtenerDetallePelicula(movieId, this, new ServiceMovieDetails.DetalleCallback() {
+        new ServiceMediaDetails().obtenerDetalle("movie",movieId, this, new ServiceMediaDetails.DetalleCallback() {
+            @SuppressLint("SetTextI18n")
             @Override
-            public void onSuccess(DetallePeliculaDTO detalle) {
+            public void onSuccess(DetalleMediaDTO detalle) {
                 textViewTituloDetalle.setText(detalle.getTitle());
-                textViewFechaDetalle.setText("Fecha de Estreno " + detalle.getReleaseDate());
+                textViewFechaDetalle.setText("Fecha de Estreno " + detalle.getRelease_date());
                 textViewDescripcionDetalle.setText(detalle.getOverview());
 
                 mostrarActoresPrincipales(detalle.getCredits().getCast());
 
-                String imageUrl = "https://image.tmdb.org/t/p/w500" + detalle.getPosterPath();
+                String imageUrl = "https://image.tmdb.org/t/p/w500" + detalle.getPoster_path();
                 Glide.with(DetallePeliculaActivity.this)
                         .load(imageUrl)
                         .into(imageViewCaratulaDetalle);
@@ -69,10 +70,10 @@ public class DetallePeliculaActivity extends AppCompatActivity {
         });
     }
 
-    private void mostrarActoresPrincipales(List<DetallePeliculaDTO.Actor> cast) {
-        List<DetallePeliculaDTO.Actor> actoresPrincipales = cast.size() > 3 ? cast.subList(0, 5) : cast;
+    private void mostrarActoresPrincipales(List<DetalleMediaDTO.Actor> cast) {
+        List<DetalleMediaDTO.Actor> actoresPrincipales = cast.size() > 3 ? cast.subList(0, 5) : cast;
         StringBuilder actoresTexto = new StringBuilder("Actores principales:\n");
-        for (DetallePeliculaDTO.Actor actor : actoresPrincipales) {
+        for (DetalleMediaDTO.Actor actor : actoresPrincipales) {
             actoresTexto.append(actor.getName()).append(" (").append(actor.getCharacter()).append(")\n");
         }
         textViewActores.setText(actoresTexto.toString());
@@ -81,18 +82,57 @@ public class DetallePeliculaActivity extends AppCompatActivity {
     private void configurarBotones(int movieId) {
         AppDatabase db = AppDatabase.getInstance(getApplicationContext());
 
-        btnAgregarFavoritos.setOnClickListener(v -> {
-            new Thread(() -> {
-                db.peliculasFavoritasDaoDao().insert(new PeliculasFavoritas(movieId));
-                runOnUiThread(() -> Toast.makeText(this, "Película añadida a favoritos", Toast.LENGTH_SHORT).show());
-            }).start();
-        });
+        new Thread(() -> {
+            PeliculasFavoritas favorita = db.peliculasFavoritasDaoDao().getPeliculaFavoritaPorId(movieId);
+            PeliculasVer paraVer = db.peliculasParaVerDaoDao().getPeliculaVerPorId(movieId);
 
-        btnAgregarParaVer.setOnClickListener(v -> {
-            new Thread(() -> {
-                db.peliculasParaVerDaoDao().insert(new PeliculasVer(movieId));
-                runOnUiThread(() -> Toast.makeText(this, "Película añadida para ver", Toast.LENGTH_SHORT).show());
-            }).start();
-        });
+            boolean esFavorita = (favorita != null);
+            boolean estaParaVer = (paraVer != null);
+
+            runOnUiThread(() -> {
+                // Configurar texto de botones según estado actual
+                btnAgregarFavoritos.setText(esFavorita ? "Quitar de Favoritos" : "Agregar a Favoritos");
+                btnAgregarParaVer.setText(estaParaVer ? "Quitar de Para Ver" : "Agregar a Para Ver");
+
+                // Listener para Favoritos
+                btnAgregarFavoritos.setOnClickListener(v -> {
+                    new Thread(() -> {
+                        if (esFavorita) {
+                            db.peliculasFavoritasDaoDao().delete(new PeliculasFavoritas(movieId));
+                            runOnUiThread(() -> {
+                                Toast.makeText(this, "Película eliminada de favoritos", Toast.LENGTH_SHORT).show();
+                                btnAgregarFavoritos.setText("Agregar a Favoritos");
+                            });
+                        } else {
+                            db.peliculasFavoritasDaoDao().insert(new PeliculasFavoritas(movieId));
+                            runOnUiThread(() -> {
+                                Toast.makeText(this, "Película añadida a favoritos", Toast.LENGTH_SHORT).show();
+                                btnAgregarFavoritos.setText("Quitar de Favoritos");
+                            });
+                        }
+                    }).start();
+                });
+
+                // Listener para Para Ver
+                btnAgregarParaVer.setOnClickListener(v -> {
+                    new Thread(() -> {
+                        if (estaParaVer) {
+                            db.peliculasParaVerDaoDao().delete(new PeliculasVer(movieId));
+                            runOnUiThread(() -> {
+                                Toast.makeText(this, "Película eliminada de la lista para ver", Toast.LENGTH_SHORT).show();
+                                btnAgregarParaVer.setText("Agregar a Para Ver");
+                            });
+                        } else {
+                            db.peliculasParaVerDaoDao().insert(new PeliculasVer(movieId));
+                            runOnUiThread(() -> {
+                                Toast.makeText(this, "Película añadida para ver", Toast.LENGTH_SHORT).show();
+                                btnAgregarParaVer.setText("Quitar de Para Ver");
+                            });
+                        }
+                    }).start();
+                });
+            });
+        }).start();
     }
+
 }

@@ -18,7 +18,6 @@ import com.example.proyecto1raentrega.dto.DetalleMediaDTO;
 import com.example.proyecto1raentrega.models.SeriesFavoritas;
 import com.example.proyecto1raentrega.models.SeriesVer;
 import com.example.proyecto1raentrega.service.ServiceMediaDetails;
-import com.example.proyecto1raentrega.service.ServiceMovieDetails;
 
 import java.util.List;
 
@@ -85,18 +84,54 @@ public class DetalleSerieActivity extends AppCompatActivity {
     private void configurarBotones(int serieId) {
         AppDatabase db = AppDatabase.getInstance(getApplicationContext());
 
-        btnAgregarFavoritos.setOnClickListener(v -> {
-            new Thread(() -> {
-                db.seriesFavoritasDaoDao().insert(new SeriesFavoritas(serieId));
-                runOnUiThread(() -> Toast.makeText(this, "Serie añadida a favoritos", Toast.LENGTH_SHORT).show());
-            }).start();
-        });
+        new Thread(() -> {
+            SeriesFavoritas favorita = db.seriesFavoritasDaoDao().getSerieFavoritaPorId(serieId);
+            SeriesVer paraVer = db.seriesVerDaoParaVerDaoDao().getSerieVerPorId(serieId);
 
-        btnAgregarParaVer.setOnClickListener(v -> {
-            new Thread(() -> {
-                db.seriesVerDaoParaVerDaoDao().insert(new SeriesVer(serieId));
-                runOnUiThread(() -> Toast.makeText(this, "Serie añadida para ver", Toast.LENGTH_SHORT).show());
-            }).start();
-        });
+            boolean esFavorita = (favorita != null);
+            boolean estaParaVer = (paraVer != null);
+
+            runOnUiThread(() -> {
+                btnAgregarFavoritos.setText(esFavorita ? "Quitar de Favoritos" : "Agregar a Favoritos");
+                btnAgregarParaVer.setText(estaParaVer ? "Quitar de Para Ver" : "Agregar a Para Ver");
+
+                btnAgregarFavoritos.setOnClickListener(v -> {
+                    new Thread(() -> {
+                        if (esFavorita) {
+                            db.seriesFavoritasDaoDao().delete(new SeriesFavoritas(serieId));
+                            runOnUiThread(() -> {
+                                Toast.makeText(this, "Serie eliminada de favoritos", Toast.LENGTH_SHORT).show();
+                                btnAgregarFavoritos.setText("Agregar a Favoritos");
+                            });
+                        } else {
+                            db.seriesFavoritasDaoDao().insert(new SeriesFavoritas(serieId));
+                            runOnUiThread(() -> {
+                                Toast.makeText(this, "Serie añadida a favoritos", Toast.LENGTH_SHORT).show();
+                                btnAgregarFavoritos.setText("Quitar de Favoritos");
+                            });
+                        }
+                    }).start();
+                });
+
+                btnAgregarParaVer.setOnClickListener(v -> {
+                    new Thread(() -> {
+                        if (estaParaVer) {
+                            db.seriesVerDaoParaVerDaoDao().delete(new SeriesVer(serieId));
+                            runOnUiThread(() -> {
+                                Toast.makeText(this, "Serie eliminada de la lista para ver", Toast.LENGTH_SHORT).show();
+                                btnAgregarParaVer.setText("Agregar a Para Ver");
+                            });
+                        } else {
+                            db.seriesVerDaoParaVerDaoDao().insert(new SeriesVer(serieId));
+                            runOnUiThread(() -> {
+                                Toast.makeText(this, "Serie añadida para ver", Toast.LENGTH_SHORT).show();
+                                btnAgregarParaVer.setText("Quitar de Para Ver");
+                            });
+                        }
+                    }).start();
+                });
+            });
+        }).start();
     }
+
 }

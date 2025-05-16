@@ -25,12 +25,9 @@ import com.example.proyecto1raentrega.activity.PeliculasParaVerActivity;
 import com.example.proyecto1raentrega.activity.SeriesFavoritasActivity;
 import com.example.proyecto1raentrega.activity.SeriesParaVerActivity;
 import com.example.proyecto1raentrega.adapter.MediaAdapter;
-import com.example.proyecto1raentrega.adapter.PeliculasAdapter;
 import com.example.proyecto1raentrega.dto.GenresDTO;
 import com.example.proyecto1raentrega.dto.MediaDTO;
-import com.example.proyecto1raentrega.dto.PeliculaDTO;
 import com.example.proyecto1raentrega.service.ServiceMedia;
-import com.example.proyecto1raentrega.service.ServiceMovies;
 import com.example.proyecto1raentrega.service.ServiceGenres;
 import com.google.android.material.navigation.NavigationView;
 

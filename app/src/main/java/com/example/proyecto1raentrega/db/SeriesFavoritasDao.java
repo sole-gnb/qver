@@ -21,4 +21,7 @@ public interface SeriesFavoritasDao {
 
     @Query("SELECT * FROM series_favoritas")
     List<SeriesFavoritas> getAllSeriesFavoritas();
+
+    @Query("SELECT * FROM series_favoritas WHERE id = :id LIMIT 1")
+    SeriesFavoritas getSerieFavoritaPorId(int id);
 }

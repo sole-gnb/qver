@@ -21,4 +21,9 @@ public interface PeliculasFavoritasDao {
 
     @Query("SELECT * FROM peliculas_favoritas")
     List<PeliculasFavoritas> getAllPeliculasFavoritas();
+
+    @Query("SELECT * FROM peliculas_favoritas WHERE id = :id LIMIT 1")
+    PeliculasFavoritas getPeliculaFavoritaPorId(int id);
+
+
 }

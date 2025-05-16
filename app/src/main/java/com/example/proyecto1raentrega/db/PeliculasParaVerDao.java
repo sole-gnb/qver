@@ -22,6 +22,9 @@ public interface PeliculasParaVerDao {
         @Query("SELECT * FROM peliculas_ver")
         List<PeliculasVer> getAllPeliculasVer();
 
+        @Query("SELECT * FROM peliculas_ver WHERE id = :id LIMIT 1")
+        PeliculasVer getPeliculaVerPorId(int id);
+
     }
 
 

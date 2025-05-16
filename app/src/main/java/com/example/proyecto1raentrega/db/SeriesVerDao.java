@@ -19,4 +19,7 @@ public interface SeriesVerDao {
 
     @Query("SELECT * FROM series_ver")
     List<SeriesVer> getAllSeriesVer();
+
+    @Query("SELECT * FROM series_ver WHERE id = :id LIMIT 1")
+    SeriesVer getSerieVerPorId(int id);
 }

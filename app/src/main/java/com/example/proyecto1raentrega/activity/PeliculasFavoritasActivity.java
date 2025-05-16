@@ -1,6 +1,5 @@
 package com.example.proyecto1raentrega.activity;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -12,13 +11,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.proyecto1raentrega.DetallePeliculaActivity;
 import com.example.proyecto1raentrega.R;
 import com.example.proyecto1raentrega.adapter.MediaAdapter;
-import com.example.proyecto1raentrega.adapter.PeliculasAdapter;
 import com.example.proyecto1raentrega.db.AppDatabase;
 import com.example.proyecto1raentrega.dto.MediaDTO;
 import com.example.proyecto1raentrega.models.PeliculasFavoritas;
-import com.example.proyecto1raentrega.dto.PeliculaDTO;
 import com.example.proyecto1raentrega.service.ServiceMediaDetails;
-import com.example.proyecto1raentrega.service.ServiceMovieDetails;
 
 import java.util.ArrayList;
 import java.util.List;
