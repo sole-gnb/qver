@@ -1,4 +1,4 @@
-package com.example.proyecto1raentrega;
+package com.example.proyecto1raentrega.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,11 +19,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.proyecto1raentrega.activity.DetalleSerieActivity;
-import com.example.proyecto1raentrega.activity.PeliculasFavoritasActivity;
-import com.example.proyecto1raentrega.activity.PeliculasParaVerActivity;
-import com.example.proyecto1raentrega.activity.SeriesFavoritasActivity;
-import com.example.proyecto1raentrega.activity.SeriesParaVerActivity;
+import com.example.proyecto1raentrega.R;
 import com.example.proyecto1raentrega.adapter.MediaAdapter;
 import com.example.proyecto1raentrega.dto.GenresDTO;
 import com.example.proyecto1raentrega.dto.MediaDTO;
@@ -36,7 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+public class MediaActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private MediaAdapter adapter;
@@ -88,14 +84,14 @@ public class MainActivity extends AppCompatActivity {
 
         if(tipo.equals("movie")) {
             adapter = new MediaAdapter(this, new ArrayList<>(), pelicula -> {
-                Intent intent = new Intent(MainActivity.this, DetallePeliculaActivity.class);
+                Intent intent = new Intent(MediaActivity.this, DetallePeliculaActivity.class);
                 intent.putExtra("pelicula_id", pelicula.getId());
                 intent.putExtra("media_type", tipo);
                 startActivity(intent);
             });
         }else{
             adapter = new MediaAdapter(this, new ArrayList<>(), pelicula -> {
-                Intent intent = new Intent(MainActivity.this, DetalleSerieActivity.class);
+                Intent intent = new Intent(MediaActivity.this, DetalleSerieActivity.class);
                 intent.putExtra("serie_id", pelicula.getId());
                 intent.putExtra("media_type", tipo);
                 startActivity(intent);
@@ -113,16 +109,16 @@ public class MainActivity extends AppCompatActivity {
             int id = menuItem.getItemId();
 
           if (id == R.id.nav_favorite_movie) {
-                Intent intent = new Intent(MainActivity.this, PeliculasFavoritasActivity.class);
+                Intent intent = new Intent(MediaActivity.this, PeliculasFavoritasActivity.class);
                 startActivity(intent);
           }else if(id == R.id.nav_movies_to_watch){
-              Intent intent = new Intent(MainActivity.this, PeliculasParaVerActivity.class);
+              Intent intent = new Intent(MediaActivity.this, PeliculasParaVerActivity.class);
               startActivity(intent);
           }else if(id == R.id.nav_favorite_series){
-              Intent intent = new Intent(MainActivity.this, SeriesFavoritasActivity.class);
+              Intent intent = new Intent(MediaActivity.this, SeriesFavoritasActivity.class);
               startActivity(intent);
           }else{
-              Intent intent = new Intent(MainActivity.this, SeriesParaVerActivity.class);
+              Intent intent = new Intent(MediaActivity.this, SeriesParaVerActivity.class);
               startActivity(intent);
           }
 
@@ -140,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                         currentPage++;
                         cargarMasPeliculas();
                     } else {
-                        Toast.makeText(MainActivity.this, "No hay más páginas", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MediaActivity.this, "No hay más páginas", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -171,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
                         nombresGeneros.add(genero.getName());
                     }
 
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this,
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(MediaActivity.this,
                             android.R.layout.simple_spinner_item, nombresGeneros);
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     spinnerGenero.setAdapter(adapter);
@@ -211,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("ServiceMovies", "Error al obtener las películas: " + error);
                 runOnUiThread(() -> {
                     isLoading = false;
-                    Toast.makeText(MainActivity.this, "Error al cargar las películas", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MediaActivity.this, "Error al cargar las películas", Toast.LENGTH_SHORT).show();
                 });
             }
         });
@@ -253,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
             public void onError(String error) {
                 runOnUiThread(() -> {
                     isLoading = false;
-                    Toast.makeText(MainActivity.this, "Error al cargar más películas", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MediaActivity.this, "Error al cargar más películas", Toast.LENGTH_SHORT).show();
                 });
             }
         });

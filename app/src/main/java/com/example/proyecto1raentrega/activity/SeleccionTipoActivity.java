@@ -6,7 +6,6 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.proyecto1raentrega.MainActivity;
 import com.example.proyecto1raentrega.R;
 
 public class SeleccionTipoActivity extends AppCompatActivity {
@@ -19,13 +18,13 @@ public class SeleccionTipoActivity extends AppCompatActivity {
         Button btnSeries = findViewById(R.id.btnSeriesSelecion);
 
         btnPeliculas.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, MediaActivity.class);
             intent.putExtra("tipo", "movie");
             startActivity(intent);
         });
 
         btnSeries.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, MediaActivity.class);
             intent.putExtra("tipo", "tv");
             startActivity(intent);
         });

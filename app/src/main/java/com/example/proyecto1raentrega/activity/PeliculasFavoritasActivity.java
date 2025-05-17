@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.proyecto1raentrega.DetallePeliculaActivity;
 import com.example.proyecto1raentrega.R;
 import com.example.proyecto1raentrega.adapter.MediaAdapter;
 import com.example.proyecto1raentrega.db.AppDatabase;
@@ -24,6 +23,10 @@ public class PeliculasFavoritasActivity extends AppCompatActivity implements Med
     private RecyclerView recyclerView;
     private MediaAdapter adapter;
     private List<MediaDTO> listaPeliculas;
+
+    private List<MediaDTO> listaFavoritas = new ArrayList<>();
+    private int totalEsperado = 0;
+    private int totalRecibido = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,20 +49,23 @@ public class PeliculasFavoritasActivity extends AppCompatActivity implements Med
                     .peliculasFavoritasDaoDao()
                     .getAllPeliculasFavoritas();
 
+            totalEsperado = favoritas.size();
+            totalRecibido = 0;
+            listaFavoritas.clear();
+
             runOnUiThread(() -> {
                 if (favoritas.isEmpty()) {
                     Toast.makeText(this, "No hay películas favoritas", Toast.LENGTH_SHORT).show();
                 } else {
-                    for (int i = 0; i < favoritas.size(); i++) {
-                        int finalI = i;
-                        cargarPeliculaDesdeAPI(favoritas.get(i).getId(), finalI == favoritas.size() - 1);
+                    for (PeliculasFavoritas favorita : favoritas) {
+                        cargarPeliculaDesdeAPI(favorita.getId());
                     }
                 }
             });
         }).start();
     }
 
-    private void cargarPeliculaDesdeAPI(int id, boolean esUltima) {
+    private void cargarPeliculaDesdeAPI(int id) {
         new ServiceMediaDetails().obtenerDetalle("movie",id, this, new ServiceMediaDetails.DetalleCallback() {
             @Override
             public void onSuccess(com.example.proyecto1raentrega.dto.DetalleMediaDTO detalle) {
@@ -69,17 +75,21 @@ public class PeliculasFavoritasActivity extends AppCompatActivity implements Med
                     media.setTitle(detalle.getTitle());
                     media.setPoster_path(detalle.getPoster_path());
 
-                    listaPeliculas.add(media);
+                    listaFavoritas.add(media);
+                    totalRecibido++;
 
-                    if (esUltima) {
-                        adapter.setMedia(listaPeliculas); // Refresca el adapter con la lista completa
+                    if (totalRecibido == totalEsperado) {
+                        adapter.setMedia(listaFavoritas);
                     }
                 });
             }
 
             @Override
             public void onError(String error) {
-                Toast.makeText(PeliculasFavoritasActivity.this, "Error cargando película: " + error, Toast.LENGTH_SHORT).show();
+                totalRecibido++;
+                if (totalRecibido == totalEsperado) {
+                    adapter.setMedia(listaFavoritas);
+                }
             }
         });
     }

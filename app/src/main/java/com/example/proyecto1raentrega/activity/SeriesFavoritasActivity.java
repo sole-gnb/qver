@@ -8,12 +8,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.proyecto1raentrega.DetallePeliculaActivity;
 import com.example.proyecto1raentrega.R;
 import com.example.proyecto1raentrega.adapter.MediaAdapter;
 import com.example.proyecto1raentrega.db.AppDatabase;
 import com.example.proyecto1raentrega.dto.MediaDTO;
-import com.example.proyecto1raentrega.models.PeliculasFavoritas;
+import com.example.proyecto1raentrega.models.PeliculasVer;
 import com.example.proyecto1raentrega.models.SeriesFavoritas;
 import com.example.proyecto1raentrega.service.ServiceMediaDetails;
 
@@ -25,6 +24,10 @@ public class SeriesFavoritasActivity extends AppCompatActivity implements MediaA
     private MediaAdapter adapter;
     private List<MediaDTO> listaSeries;
 
+    private List<MediaDTO> listaFavoritas = new ArrayList<>();
+    private int totalEsperado = 0;
+    private int totalRecibido = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +36,6 @@ public class SeriesFavoritasActivity extends AppCompatActivity implements MediaA
         recyclerView = findViewById(R.id.recyclerViewFavoritos);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         listaSeries = new ArrayList<>();
-
         adapter = new MediaAdapter(this, listaSeries, this);
         recyclerView.setAdapter(adapter);
 
@@ -46,20 +48,23 @@ public class SeriesFavoritasActivity extends AppCompatActivity implements MediaA
                     .seriesFavoritasDaoDao()
                     .getAllSeriesFavoritas();
 
+            totalEsperado = favoritas.size();
+            totalRecibido = 0;
+            listaFavoritas.clear();
+
             runOnUiThread(() -> {
                 if (favoritas.isEmpty()) {
                     Toast.makeText(this, "No hay series favoritas", Toast.LENGTH_SHORT).show();
                 } else {
-                    for (int i = 0; i < favoritas.size(); i++) {
-                        int finalI = i;
-                        cargarPeliculaDesdeAPI(favoritas.get(i).getId(), finalI == favoritas.size() - 1);
+                    for (SeriesFavoritas paraver : favoritas) {
+                        cargarPeliculaDesdeAPI(paraver.getId());
                     }
                 }
             });
         }).start();
     }
 
-    private void cargarPeliculaDesdeAPI(int id, boolean esUltima) {
+    private void cargarPeliculaDesdeAPI(int id) {
         new ServiceMediaDetails().obtenerDetalle("tv",id, this, new ServiceMediaDetails.DetalleCallback() {
             @Override
             public void onSuccess(com.example.proyecto1raentrega.dto.DetalleMediaDTO detalle) {
@@ -69,17 +74,21 @@ public class SeriesFavoritasActivity extends AppCompatActivity implements MediaA
                     media.setTitle(detalle.getName());
                     media.setPoster_path(detalle.getPoster_path());
 
-                    listaSeries.add(media);
+                    listaFavoritas.add(media);
+                    totalRecibido++;
 
-                    if (esUltima) {
-                        adapter.setMedia(listaSeries); // Refresca el adapter con la lista completa
+                    if (totalRecibido == totalEsperado) {
+                        adapter.setMedia(listaFavoritas);
                     }
                 });
             }
 
             @Override
             public void onError(String error) {
-                Toast.makeText(SeriesFavoritasActivity.this, "Error cargando película: " + error, Toast.LENGTH_SHORT).show();
+                totalRecibido++;
+                if (totalRecibido == totalEsperado) {
+                    adapter.setMedia(listaFavoritas);
+                }
             }
         });
     }

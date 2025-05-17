@@ -2,6 +2,7 @@ package com.example.proyecto1raentrega.activity;
 
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -32,6 +33,8 @@ public class DetalleSerieActivity extends AppCompatActivity {
     private Button btnAgregarFavoritos;
     private Button btnAgregarParaVer;
 
+    private Button btnCompartir;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,7 @@ public class DetalleSerieActivity extends AppCompatActivity {
         textViewActores = findViewById(R.id.textViewActoresDetalle);
         btnAgregarFavoritos = findViewById(R.id.btnAgregarFavoritos);
         btnAgregarParaVer = findViewById(R.id.btnAgregarParaVer);
+        btnCompartir = findViewById(R.id.btnCompartir);
 
         int serieId = getIntent().getIntExtra("serie_id", 0);
 
@@ -63,6 +67,18 @@ public class DetalleSerieActivity extends AppCompatActivity {
                         .into(imageViewCaratulaDetalle);
 
                 configurarBotones(serieId);
+
+                btnCompartir.setOnClickListener(v -> {
+                    String tmdbUrl = "https://www.themoviedb.org/movie/" + detalle.getId();
+
+                    Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setType("text/plain");
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "¡Mirá esta serie!");
+                    intent.putExtra(Intent.EXTRA_TEXT, "Te recomiendo esta serie: " + detalle.getName() +
+                            "\n\nLink: " + tmdbUrl);
+
+                    startActivity(Intent.createChooser(intent, "Compartir con"));
+                });
             }
 
             @Override

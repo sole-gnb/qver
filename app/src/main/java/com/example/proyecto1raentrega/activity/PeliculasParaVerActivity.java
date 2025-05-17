@@ -10,11 +10,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.proyecto1raentrega.DetallePeliculaActivity;
 import com.example.proyecto1raentrega.R;
 import com.example.proyecto1raentrega.adapter.MediaAdapter;
 import com.example.proyecto1raentrega.db.AppDatabase;
 import com.example.proyecto1raentrega.dto.MediaDTO;
+import com.example.proyecto1raentrega.models.PeliculasFavoritas;
 import com.example.proyecto1raentrega.models.PeliculasVer;
 import com.example.proyecto1raentrega.service.ServiceMediaDetails;
 
@@ -26,7 +26,12 @@ public class PeliculasParaVerActivity  extends AppCompatActivity implements Medi
 
     private RecyclerView recyclerView;
     private MediaAdapter adapter;
+
     private List<MediaDTO> listaPeliculas;
+
+    private List<MediaDTO> listaFavoritas = new ArrayList<>();
+    private int totalEsperado = 0;
+    private int totalRecibido = 0;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -37,7 +42,8 @@ public class PeliculasParaVerActivity  extends AppCompatActivity implements Medi
         recyclerView = findViewById(R.id.recyclerViewFavoritos);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         listaPeliculas = new ArrayList<>();
-
+        adapter = new MediaAdapter(this, listaPeliculas, this);
+        recyclerView.setAdapter(adapter);
         cargarPeliculasParaVer();
 
 
@@ -46,24 +52,27 @@ public class PeliculasParaVerActivity  extends AppCompatActivity implements Medi
     @SuppressLint("NotifyDataSetChanged")
     private void cargarPeliculasParaVer() {
         new Thread(() -> {
-            List<PeliculasVer> favoritas = AppDatabase.getInstance(this)
+            List<PeliculasVer> ver = AppDatabase.getInstance(this)
                     .peliculasParaVerDaoDao()
                     .getAllPeliculasVer();
 
+            totalEsperado = ver.size();
+            totalRecibido = 0;
+            listaFavoritas.clear();
+
             runOnUiThread(() -> {
-                if (favoritas.isEmpty()) {
+                if (ver.isEmpty()) {
                     Toast.makeText(this, "No hay películas favoritas", Toast.LENGTH_SHORT).show();
                 } else {
-                    for (int i = 0; i < favoritas.size(); i++) {
-                        int finalI = i;
-                        cargarPeliculaDesdeAPI(favoritas.get(i).getId(), finalI == favoritas.size() - 1);
+                    for (PeliculasVer paraver : ver) {
+                        cargarPeliculaDesdeAPI(paraver.getId());
                     }
                 }
             });
         }).start();
     }
 
-    private void cargarPeliculaDesdeAPI(int id, boolean esUltima) {
+    private void cargarPeliculaDesdeAPI(int id) {
         new ServiceMediaDetails().obtenerDetalle("movie",id, this, new ServiceMediaDetails.DetalleCallback() {
             @Override
             public void onSuccess(com.example.proyecto1raentrega.dto.DetalleMediaDTO detalle) {
@@ -72,12 +81,11 @@ public class PeliculasParaVerActivity  extends AppCompatActivity implements Medi
                     peliculaDTO.setId(detalle.getId());
                     peliculaDTO.setTitle(detalle.getTitle());
                     peliculaDTO.setPoster_path(detalle.getPoster_path());
+                    listaFavoritas.add(peliculaDTO);
+                    totalRecibido++;
 
-                    listaPeliculas.add(peliculaDTO);
-
-                    if (esUltima) {
-                        adapter = new MediaAdapter(PeliculasParaVerActivity.this, listaPeliculas, PeliculasParaVerActivity.this);
-                        recyclerView.setAdapter(adapter);
+                    if (totalRecibido == totalEsperado) {
+                        adapter.setMedia(listaFavoritas);
                     }
                 });
             }
@@ -85,7 +93,10 @@ public class PeliculasParaVerActivity  extends AppCompatActivity implements Medi
 
             @Override
             public void onError(String error) {
-                Toast.makeText(PeliculasParaVerActivity.this, "Error cargando película: " + error, Toast.LENGTH_SHORT).show();
+                totalRecibido++;
+                if (totalRecibido == totalEsperado) {
+                    adapter.setMedia(listaFavoritas);
+                }
             }
         });
 

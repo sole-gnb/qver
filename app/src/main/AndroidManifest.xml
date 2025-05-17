@@ -17,7 +17,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".DetallePeliculaActivity"
+            android:name=".activity.DetallePeliculaActivity"
             android:exported="false" />
 
         <activity
@@ -25,7 +25,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MediaActivity"
             android:exported="false" />
 
         <activity

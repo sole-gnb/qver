@@ -25,6 +25,10 @@ public class SeriesParaVerActivity extends AppCompatActivity implements MediaAda
     private MediaAdapter adapter;
     private List<MediaDTO> listaSeries;
 
+    private List<MediaDTO> listaFavoritas = new ArrayList<>();
+    private int totalEsperado = 0;
+    private int totalRecibido = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,24 +46,27 @@ public class SeriesParaVerActivity extends AppCompatActivity implements MediaAda
 
     private void cargarPeliculasFavoritas() {
         new Thread(() -> {
-            List<SeriesVer> favoritas = AppDatabase.getInstance(this)
+            List<SeriesVer> seriesVer = AppDatabase.getInstance(this)
                     .seriesVerDaoParaVerDaoDao()
                     .getAllSeriesVer();
 
+            totalEsperado = seriesVer.size();
+            totalRecibido = 0;
+            listaFavoritas.clear();
+
             runOnUiThread(() -> {
-                if (favoritas.isEmpty()) {
+                if (seriesVer.isEmpty()) {
                     Toast.makeText(this, "No hay series para ver", Toast.LENGTH_SHORT).show();
                 } else {
-                    for (int i = 0; i < favoritas.size(); i++) {
-                        int finalI = i;
-                        cargarPeliculaDesdeAPI(favoritas.get(i).getId(), finalI == favoritas.size() - 1);
+                    for (SeriesVer paraver : seriesVer) {
+                        cargarPeliculaDesdeAPI(paraver.getId());
                     }
                 }
             });
         }).start();
     }
 
-    private void cargarPeliculaDesdeAPI(int id, boolean esUltima) {
+    private void cargarPeliculaDesdeAPI(int id) {
         new ServiceMediaDetails().obtenerDetalle("tv",id, this, new ServiceMediaDetails.DetalleCallback() {
             @Override
             public void onSuccess(com.example.proyecto1raentrega.dto.DetalleMediaDTO detalle) {
@@ -69,17 +76,20 @@ public class SeriesParaVerActivity extends AppCompatActivity implements MediaAda
                     media.setTitle(detalle.getName());
                     media.setPoster_path(detalle.getPoster_path());
 
-                    listaSeries.add(media);
+                    listaFavoritas.add(media);
+                    totalRecibido++;
 
-                    if (esUltima) {
-                        adapter.setMedia(listaSeries); // Refresca el adapter con la lista completa
+                    if (totalRecibido == totalEsperado) {
+                        adapter.setMedia(listaFavoritas);
                     }
                 });
             }
-
             @Override
             public void onError(String error) {
-                Toast.makeText(SeriesParaVerActivity.this, "Error cargando serie: " + error, Toast.LENGTH_SHORT).show();
+                totalRecibido++;
+                if (totalRecibido == totalEsperado) {
+                    adapter.setMedia(listaFavoritas);
+                }
             }
         });
     }

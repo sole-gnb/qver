@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
@@ -83,7 +84,7 @@
                 android:textAllCaps="false"
                 android:backgroundTint="@color/design_default_color_primary"
                 android:textColor="@android:color/white"
-                android:layout_marginEnd="8dp"/>
+                android:layout_marginEnd="7dp"/>
 
             <Button
                 android:id="@+id/btnAgregarParaVer"
@@ -94,7 +95,17 @@
                 android:textAllCaps="false"
                 android:backgroundTint="@color/design_default_color_primary"
                 android:textColor="@android:color/white"
-                android:layout_marginStart="8dp"/>
+                android:layout_marginStart="7dp"/>
+
+            <Button
+                android:id="@+id/btnCompartir"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Compartir"
+                android:textAllCaps="false"
+                android:backgroundTint="@color/design_default_color_primary"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="7dp"/>
         </LinearLayout>
 
     </LinearLayout>

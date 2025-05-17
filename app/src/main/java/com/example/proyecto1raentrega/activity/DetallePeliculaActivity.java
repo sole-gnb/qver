@@ -1,6 +1,7 @@
-package com.example.proyecto1raentrega;
+package com.example.proyecto1raentrega.activity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -10,6 +11,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.example.proyecto1raentrega.R;
 import com.example.proyecto1raentrega.db.AppDatabase;
 import com.example.proyecto1raentrega.dto.DetalleMediaDTO;
 import com.example.proyecto1raentrega.models.PeliculasFavoritas;
@@ -29,6 +31,8 @@ public class DetallePeliculaActivity extends AppCompatActivity {
     private Button btnAgregarFavoritos;
     private Button btnAgregarParaVer;
 
+    private Button btnCompartir;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +46,7 @@ public class DetallePeliculaActivity extends AppCompatActivity {
         textViewActores = findViewById(R.id.textViewActoresDetalle);
         btnAgregarFavoritos = findViewById(R.id.btnAgregarFavoritos);
         btnAgregarParaVer = findViewById(R.id.btnAgregarParaVer);
+        btnCompartir = findViewById(R.id.btnCompartir);
 
         int movieId = getIntent().getIntExtra("pelicula_id", 0);
 
@@ -61,6 +66,18 @@ public class DetallePeliculaActivity extends AppCompatActivity {
                         .into(imageViewCaratulaDetalle);
 
                 configurarBotones(movieId);
+
+                btnCompartir.setOnClickListener(v -> {
+                    String tmdbUrl = "https://www.themoviedb.org/movie/" + detalle.getId();
+
+                    Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setType("text/plain");
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "¡Mirá esta película!");
+                    intent.putExtra(Intent.EXTRA_TEXT, "Te recomiendo esta película: " + detalle.getTitle() +
+                            "\n\nLink: " + tmdbUrl);
+
+                    startActivity(Intent.createChooser(intent, "Compartir con"));
+                });
             }
 
             @Override
