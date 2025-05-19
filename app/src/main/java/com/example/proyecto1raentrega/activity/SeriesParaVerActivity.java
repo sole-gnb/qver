@@ -15,6 +15,7 @@ import com.example.proyecto1raentrega.dto.MediaDTO;
 import com.example.proyecto1raentrega.models.SeriesFavoritas;
 import com.example.proyecto1raentrega.models.SeriesVer;
 import com.example.proyecto1raentrega.service.ServiceMediaDetails;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,14 @@ public class SeriesParaVerActivity extends AppCompatActivity implements MediaAda
 
         adapter = new MediaAdapter(this, listaSeries, this);
         recyclerView.setAdapter(adapter);
+        MaterialToolbar toolbar = findViewById(R.id.toolbarFavoritos);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setTitle("Series para ver");
+        }
+        toolbar.setNavigationOnClickListener(v -> onSupportNavigateUp());
 
         cargarPeliculasFavoritas();
     }
@@ -99,5 +108,13 @@ public class SeriesParaVerActivity extends AppCompatActivity implements MediaAda
         Intent intent = new Intent(this, DetalleSerieActivity.class);
         intent.putExtra("serie_id", media.getId());
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        Intent intent = new Intent(this, MediaActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        return true;
     }
 }

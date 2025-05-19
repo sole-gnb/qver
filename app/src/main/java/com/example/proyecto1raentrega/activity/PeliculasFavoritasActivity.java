@@ -14,6 +14,7 @@ import com.example.proyecto1raentrega.db.AppDatabase;
 import com.example.proyecto1raentrega.dto.MediaDTO;
 import com.example.proyecto1raentrega.models.PeliculasFavoritas;
 import com.example.proyecto1raentrega.service.ServiceMediaDetails;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,15 @@ public class PeliculasFavoritasActivity extends AppCompatActivity implements Med
 
         adapter = new MediaAdapter(this, listaPeliculas, this);
         recyclerView.setAdapter(adapter);
+        MaterialToolbar toolbar = findViewById(R.id.toolbarFavoritos);
+        setSupportActionBar(toolbar);
+        // Mostrar botón de retroceso
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setTitle("Películas Favoritas"); // Si querés asegurarte del título
+        }
+        toolbar.setNavigationOnClickListener(v -> onSupportNavigateUp());
 
         cargarPeliculasFavoritas();
     }
@@ -91,6 +101,7 @@ public class PeliculasFavoritasActivity extends AppCompatActivity implements Med
                     adapter.setMedia(listaFavoritas);
                 }
             }
+
         });
     }
 
@@ -99,5 +110,13 @@ public class PeliculasFavoritasActivity extends AppCompatActivity implements Med
         Intent intent = new Intent(this, DetallePeliculaActivity.class);
         intent.putExtra("pelicula_id", media.getId());
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        Intent intent = new Intent(this, MediaActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        return true;
     }
 }

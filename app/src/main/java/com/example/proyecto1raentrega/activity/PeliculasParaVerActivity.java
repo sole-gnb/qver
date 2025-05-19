@@ -17,6 +17,7 @@ import com.example.proyecto1raentrega.dto.MediaDTO;
 import com.example.proyecto1raentrega.models.PeliculasFavoritas;
 import com.example.proyecto1raentrega.models.PeliculasVer;
 import com.example.proyecto1raentrega.service.ServiceMediaDetails;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,14 @@ public class PeliculasParaVerActivity  extends AppCompatActivity implements Medi
         listaPeliculas = new ArrayList<>();
         adapter = new MediaAdapter(this, listaPeliculas, this);
         recyclerView.setAdapter(adapter);
+        MaterialToolbar toolbar = findViewById(R.id.toolbarFavoritos);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setTitle("Pelíulas para Ver");
+        }
+        toolbar.setNavigationOnClickListener(v -> onSupportNavigateUp());
         cargarPeliculasParaVer();
 
 
@@ -107,6 +116,14 @@ public class PeliculasParaVerActivity  extends AppCompatActivity implements Medi
         Intent intent = new Intent(this, DetallePeliculaActivity.class);
         intent.putExtra("pelicula_id", pelicula.getId());
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        Intent intent = new Intent(this, MediaActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        return true;
     }
 }
 

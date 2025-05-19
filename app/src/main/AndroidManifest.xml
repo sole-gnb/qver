@@ -12,9 +12,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Proyecto1raentrega"
         tools:targetApi="31"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:theme="@style/Theme.MaterialComponents.DayNight.DarkActionBar">
 
         <activity
             android:name=".activity.DetallePeliculaActivity"
@@ -26,27 +26,29 @@
 
         <activity
             android:name=".activity.MediaActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <activity
             android:name=".activity.SeleccionTipoActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".activity.PeliculasFavoritasActivity">
-        </activity>
-        <activity android:name=".activity.PeliculasParaVerActivity">
-        </activity>
-        <activity android:name=".activity.DetalleSerieActivity">
-        </activity>
-        <activity android:name=".activity.SeriesFavoritasActivity">
-        </activity>
-        <activity android:name=".activity.SeriesParaVerActivity">
-        </activity>
+        <activity android:name=".activity.PeliculasFavoritasActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activity.PeliculasParaVerActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activity.DetalleSerieActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activity.SeriesFavoritasActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activity.SeriesParaVerActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
 
 
     </application>
