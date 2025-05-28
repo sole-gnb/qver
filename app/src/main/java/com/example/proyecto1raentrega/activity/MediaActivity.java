@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -50,6 +51,9 @@ public class MediaActivity extends AppCompatActivity {
     private Spinner spinnerGenero;
     private EditText editTextAnio;
     private Button btnFiltrar;
+    private Button btnToggleFiltros;
+
+    private LinearLayout layoutFiltros;
 
     // Mapeo entre IDs y nombres de géneros
     private Map<Integer, String> generosMap = new HashMap<>();
@@ -70,6 +74,9 @@ public class MediaActivity extends AppCompatActivity {
 
         // ---------------------- SETUP UI ----------------------
 
+        btnToggleFiltros = findViewById(R.id.btnToggleFiltros);
+        layoutFiltros = findViewById(R.id.layoutFiltros);
+
         drawerLayout = findViewById(R.id.drawerLayout);
         navigationView = findViewById(R.id.navigationView);
 
@@ -87,10 +94,13 @@ public class MediaActivity extends AppCompatActivity {
         // Configurar RecyclerView con diseño vertical
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
-        // Ocultar filtros si el móvil está en horizontal
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            ocultarFiltrosEnHorizontal();
-        }
+        btnToggleFiltros.setOnClickListener(v -> {
+            if (layoutFiltros.getVisibility() == View.VISIBLE) {
+                layoutFiltros.setVisibility(View.GONE);
+            } else {
+                layoutFiltros.setVisibility(View.VISIBLE);
+            }
+        });
 
         // ---------------------- LOGICA PRINCIPAL ----------------------
 
@@ -121,7 +131,10 @@ public class MediaActivity extends AppCompatActivity {
         obtenerPeliculas(tipo, currentPage, 0, null, 0);
 
         // Filtro por botón
-        btnFiltrar.setOnClickListener(v -> aplicarFiltros());
+        btnFiltrar.setOnClickListener(v -> {
+            layoutFiltros.setVisibility(View.GONE);
+            aplicarFiltros();
+        });
 
         // ---------------------- NAVEGACION MENU ----------------------
 
@@ -299,12 +312,5 @@ public class MediaActivity extends AppCompatActivity {
         obtenerPeliculas(tipo, currentPage, idGenero, titulo, Integer.parseInt(anio));
     }
 
-    // Oculta los filtros si el móvil está en landscape (horizontal)
-    private void ocultarFiltrosEnHorizontal() {
-        autoCompleteTitulo.setVisibility(View.GONE);
-        spinnerGenero.setVisibility(View.GONE);
-        editTextAnio.setVisibility(View.GONE);
-        btnFiltrar.setVisibility(View.GONE);
-    }
 }
 
