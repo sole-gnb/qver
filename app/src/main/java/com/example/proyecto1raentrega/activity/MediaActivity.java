@@ -1,13 +1,16 @@
 package com.example.proyecto1raentrega.activity;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -34,54 +37,77 @@ import java.util.Map;
 
 public class MediaActivity extends AppCompatActivity {
 
+    // RecyclerView para mostrar la lista de películas o series
     private RecyclerView recyclerView;
     private MediaAdapter adapter;
+
+    // Paginación
     private int currentPage = 1;
     private boolean isLoading = false;
     private static final int TOTAL_PAGES = 10;
 
+    // Filtros
     private AutoCompleteTextView autoCompleteTitulo;
     private Spinner spinnerGenero;
     private EditText editTextAnio;
     private Button btnFiltrar;
+    private Button btnToggleFiltros;
 
+    private LinearLayout layoutFiltros;
+
+    // Mapeo entre IDs y nombres de géneros
     private Map<Integer, String> generosMap = new HashMap<>();
     private List<String> nombresGeneros = new ArrayList<>();
 
-    private List<MediaDTO> listaPeliculas = new ArrayList<>(); // Agregado para manejar la lista.
+    // Lista principal de medios (películas o series)
+    private List<MediaDTO> listaPeliculas = new ArrayList<>();
 
+    // Navegación lateral
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
-    private String tipo;
+    private String tipo;  // Tipo de contenido ("movie" o "tv")
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Configurar DrawerLayout y NavigationView
+        // ---------------------- SETUP UI ----------------------
+
+        btnToggleFiltros = findViewById(R.id.btnToggleFiltros);
+        layoutFiltros = findViewById(R.id.layoutFiltros);
+
         drawerLayout = findViewById(R.id.drawerLayout);
         navigationView = findViewById(R.id.navigationView);
 
-        // Configurar Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        // Habilitar el ícono de hamburguesa en la ActionBar
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.baseline_menu_24); // Asegúrate de tener el ícono
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.baseline_menu_24);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Configurar el RecyclerView y los filtros
         recyclerView = findViewById(R.id.recyclerViewPeliculas);
         autoCompleteTitulo = findViewById(R.id.autoCompleteTitulo);
         spinnerGenero = findViewById(R.id.spinnerGenero);
         editTextAnio = findViewById(R.id.editTextAnio);
         btnFiltrar = findViewById(R.id.btnFiltrar);
 
+        // Configurar RecyclerView con diseño vertical
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
+        btnToggleFiltros.setOnClickListener(v -> {
+            if (layoutFiltros.getVisibility() == View.VISIBLE) {
+                layoutFiltros.setVisibility(View.GONE);
+            } else {
+                layoutFiltros.setVisibility(View.VISIBLE);
+            }
+        });
+
+        // ---------------------- LOGICA PRINCIPAL ----------------------
+
+        // Obtener tipo de media enviado desde la actividad anterior ("movie" o "tv")
         tipo = getIntent().getStringExtra("tipo");
 
+        // Adaptador con listener para abrir detalles
         if(tipo.equals("movie")) {
             adapter = new MediaAdapter(this, new ArrayList<>(), pelicula -> {
                 Intent intent = new Intent(MediaActivity.this, DetallePeliculaActivity.class);
@@ -89,7 +115,7 @@ public class MediaActivity extends AppCompatActivity {
                 intent.putExtra("media_type", tipo);
                 startActivity(intent);
             });
-        }else{
+        } else {
             adapter = new MediaAdapter(this, new ArrayList<>(), pelicula -> {
                 Intent intent = new Intent(MediaActivity.this, DetalleSerieActivity.class);
                 intent.putExtra("serie_id", pelicula.getId());
@@ -100,37 +126,42 @@ public class MediaActivity extends AppCompatActivity {
 
         recyclerView.setAdapter(adapter);
 
+        // Cargar géneros y películas iniciales
         cargarGeneros();
-        obtenerPeliculas(tipo,currentPage, 0, null, 0);
+        obtenerPeliculas(tipo, currentPage, 0, null, 0);
 
-        btnFiltrar.setOnClickListener(v -> aplicarFiltros());
+        // Filtro por botón
+        btnFiltrar.setOnClickListener(v -> {
+            layoutFiltros.setVisibility(View.GONE);
+            aplicarFiltros();
+        });
+
+        // ---------------------- NAVEGACION MENU ----------------------
 
         navigationView.setNavigationItemSelectedListener(menuItem -> {
             int id = menuItem.getItemId();
 
-          if (id == R.id.nav_favorite_movie) {
-                Intent intent = new Intent(MediaActivity.this, PeliculasFavoritasActivity.class);
-                startActivity(intent);
-          }else if(id == R.id.nav_movies_to_watch){
-              Intent intent = new Intent(MediaActivity.this, PeliculasParaVerActivity.class);
-              startActivity(intent);
-          }else if(id == R.id.nav_favorite_series){
-              Intent intent = new Intent(MediaActivity.this, SeriesFavoritasActivity.class);
-              startActivity(intent);
-          }else{
-              Intent intent = new Intent(MediaActivity.this, SeriesParaVerActivity.class);
-              startActivity(intent);
-          }
+            // Lógica de navegación según el ítem seleccionado
+            if (id == R.id.nav_favorite_movie) {
+                startActivity(new Intent(this, PeliculasFavoritasActivity.class));
+            } else if (id == R.id.nav_movies_to_watch) {
+                startActivity(new Intent(this, PeliculasParaVerActivity.class));
+            } else if (id == R.id.nav_favorite_series) {
+                startActivity(new Intent(this, SeriesFavoritasActivity.class));
+            } else {
+                startActivity(new Intent(this, SeriesParaVerActivity.class));
+            }
 
-            drawerLayout.closeDrawer(GravityCompat.START); // Cerrar el Drawer después de seleccionar
+            drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         });
+
+        // ---------------------- INFINITE SCROLL ----------------------
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
+                // Si no está cargando y ha llegado al fondo, carga más
                 if (!isLoading && !recyclerView.canScrollVertically(1)) {
                     if (currentPage < TOTAL_PAGES) {
                         currentPage++;
@@ -143,6 +174,7 @@ public class MediaActivity extends AppCompatActivity {
         });
     }
 
+    // Maneja la apertura del Drawer al tocar el icono del menú
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -151,14 +183,17 @@ public class MediaActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    // ---------------------- MÉTODOS DE LÓGICA ----------------------
+
+    // Llama a la API para obtener géneros
     private void cargarGeneros() {
-        ServiceGenres.getGenres(tipo,new ServiceGenres.GenresCallback() {
+        ServiceGenres.getGenres(tipo, new ServiceGenres.GenresCallback() {
             @Override
             public void onSuccess(List<GenresDTO> generos) {
                 runOnUiThread(() -> {
+                    // Mapear y mostrar en el Spinner
                     generosMap.clear();
                     nombresGeneros.clear();
-
                     nombresGeneros.add("Todos los géneros");
                     generosMap.put(-1, "Todos los géneros");
 
@@ -181,13 +216,15 @@ public class MediaActivity extends AppCompatActivity {
         });
     }
 
-    private void obtenerPeliculas(String type,int page, int genero, String titulo, int anio) {
+    // Llama a la API para obtener películas o series filtradas
+    private void obtenerPeliculas(String type, int page, int genero, String titulo, int anio) {
         isLoading = true;
         ServiceMedia serviceMovies = new ServiceMedia();
-        serviceMovies.obtenerMedia(type,page, genero, titulo, anio, this, new ServiceMedia.MediaCallback() {
+        serviceMovies.obtenerMedia(type, page, genero, titulo, anio, this, new ServiceMedia.MediaCallback() {
             @Override
             public void onSuccess(List<MediaDTO> peliculas) {
                 runOnUiThread(() -> {
+                    // Si es la primera página, reemplaza; si no, añade
                     if (page == 1) {
                         listaPeliculas.clear();
                         listaPeliculas.addAll(peliculas);
@@ -204,7 +241,6 @@ public class MediaActivity extends AppCompatActivity {
 
             @Override
             public void onError(String error) {
-                Log.e("ServiceMovies", "Error al obtener las películas: " + error);
                 runOnUiThread(() -> {
                     isLoading = false;
                     Toast.makeText(MediaActivity.this, "Error al cargar las películas", Toast.LENGTH_SHORT).show();
@@ -213,14 +249,13 @@ public class MediaActivity extends AppCompatActivity {
         });
     }
 
+    // Lógica de scroll infinito: carga más contenido al llegar al final
     private void cargarMasPeliculas() {
         isLoading = true;
 
         String titulo = autoCompleteTitulo.getText().toString().trim();
         String anio = editTextAnio.getText().toString().trim();
-        if (anio.isEmpty()) {
-            anio = "0";
-        }
+        if (anio.isEmpty()) anio = "0";
 
         int idGenero = -1;
         String nombreGenero = spinnerGenero.getSelectedItem().toString();
@@ -232,7 +267,7 @@ public class MediaActivity extends AppCompatActivity {
         }
 
         ServiceMedia serviceMovies = new ServiceMedia();
-        serviceMovies.obtenerMedia(tipo,currentPage, idGenero, titulo, Integer.parseInt(anio), this, new ServiceMedia.MediaCallback() {
+        serviceMovies.obtenerMedia(tipo, currentPage, idGenero, titulo, Integer.parseInt(anio), this, new ServiceMedia.MediaCallback() {
             @Override
             public void onSuccess(List<MediaDTO> peliculas) {
                 runOnUiThread(() -> {
@@ -255,12 +290,11 @@ public class MediaActivity extends AppCompatActivity {
         });
     }
 
+    // Aplica filtros desde la UI y reinicia desde la página 1
     private void aplicarFiltros() {
         String titulo = autoCompleteTitulo.getText().toString().trim();
         String anio = editTextAnio.getText().toString().trim();
-        if (anio.equals("")) {
-            anio = "0";
-        }
+        if (anio.isEmpty()) anio = "0";
 
         int idGenero = -1;
         String nombreGenero = spinnerGenero.getSelectedItem().toString();
@@ -270,10 +304,13 @@ public class MediaActivity extends AppCompatActivity {
                 break;
             }
         }
+
         currentPage = 1;
         listaPeliculas.clear();
         adapter.setMedia(new ArrayList<>());
         recyclerView.post(() -> recyclerView.scrollToPosition(0));
-        obtenerPeliculas(tipo,currentPage, idGenero, titulo, Integer.parseInt(anio));
+        obtenerPeliculas(tipo, currentPage, idGenero, titulo, Integer.parseInt(anio));
     }
+
 }
+
