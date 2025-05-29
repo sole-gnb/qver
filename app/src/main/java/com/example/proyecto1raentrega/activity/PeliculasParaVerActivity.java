@@ -60,7 +60,7 @@ public class PeliculasParaVerActivity extends AppCompatActivity implements Media
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);  // Mostrar flecha de retroceso
             getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setTitle("Pelíulas para Ver");  // Título del toolbar
+            getSupportActionBar().setTitle("Películas para Ver");  // Título del toolbar
         }
         toolbar.setNavigationOnClickListener(v -> onSupportNavigateUp());
 
